@@ -11,32 +11,25 @@ local ToolActivate = ReplicatedStorage.Shared.Packages.Knit.Services.ToolService
 getgenv().Config = {
     AutoMine = true,
     SafeDistance = 7,
-    MaxHP = 500,
+    MaxHP = 500,  
     MinSwingDelay = 0.25,
     MaxSwingDelay = 0.45,
+
     RockFolder = "Island1CaveMid" -- Choose one: "Roof", "Island1CaveDeep", "Island1CaveStart", "Island1CaveMid"
 }
 
 local function GetRockHP(Hitbox)
     local Model = Hitbox:FindFirstAncestorWhichIsA("Model")
-    if not Model then
-        return nil
-    end
+    if not Model then return nil end
 
     local Info = Model:FindFirstChild("infoFrame", true)
-    if not Info then
-        return nil
-    end
+    if not Info then return nil end
 
     local Frame = Info:FindFirstChild("Frame")
-    if not Frame then
-        return nil
-    end
+    if not Frame then return nil end
 
     local HPLabel = Frame:FindFirstChild("rockHP")
-    if not HPLabel or not HPLabel:IsA("TextLabel") then
-        return nil
-    end
+    if not HPLabel or not HPLabel:IsA("TextLabel") then return nil end
 
     local Text = HPLabel.Text or ""
     Text = Text:gsub(",", ""):gsub("[^%d]", "")
@@ -45,9 +38,7 @@ end
 
 local function GetRockFolder()
     local Rocks = workspace:WaitForChild("Rocks", 5)
-    if not Rocks then
-        return nil
-    end
+    if not Rocks then return nil end
 
     local Folder = Rocks:FindFirstChild(getgenv().Config.RockFolder)
     if Folder and Folder:IsA("Folder") then
@@ -60,9 +51,7 @@ end
 local function ScanHitboxes()
     local Result = {}
     local Folder = GetRockFolder()
-    if not Folder then
-        return Result
-    end
+    if not Folder then return Result end
 
     for _, Inst in ipairs(Folder:GetDescendants()) do
         if Inst.Name == "Hitbox" and Inst:IsA("BasePart") then
@@ -75,13 +64,11 @@ end
 local OreList = ScanHitboxes()
 local SelectedFolder = GetRockFolder()
 if SelectedFolder then
-    SelectedFolder.DescendantAdded:Connect(
-        function(Child)
-            if Child.Name == "Hitbox" and Child:IsA("BasePart") then
-                table.insert(OreList, Child)
-            end
+    SelectedFolder.DescendantAdded:Connect(function(Child)
+        if Child.Name == "Hitbox" and Child:IsA("BasePart") then
+            table.insert(OreList, Child)
         end
-    )
+    end)
 end
 
 local function GetClosestOre()
@@ -109,60 +96,46 @@ local function GoTo(TargetPos, FacePos)
     local Speed = math.random(12, 18)
     local Duration = Distance / Speed
     Duration = Duration * (math.random(75, 125) / 100)
-    if Duration < 0.6 then
-        Duration = 0.6
-    end
+    if Duration < 0.6 then Duration = 0.6 end
 
     local CF = CFrame.new(TargetPos, FacePos)
-    local Tween =
-        TweenService:Create(
-        Root,
-        TweenInfo.new(Duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-        {CFrame = CF}
-    )
+    local Tween = TweenService:Create(Root, TweenInfo.new(Duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {CFrame = CF})
     Tween:Play()
     Tween.Completed:Wait()
 end
 
 local CurrentTarget = nil
 
-task.spawn(
-    function()
-        while task.wait(0.15) do
-            if not getgenv().Config.AutoMine then
-                continue
-            end
+task.spawn(function()
+    while task.wait(0.15) do
+        if not getgenv().Config.AutoMine then continue end
 
-            if CurrentTarget and CurrentTarget.Parent then
-                local HP = GetRockHP(CurrentTarget)
-                if not HP then
-                    CurrentTarget = nil
-                    continue
-                end
-            else
+        if CurrentTarget and CurrentTarget.Parent then
+            local HP = GetRockHP(CurrentTarget)
+            if not HP then
                 CurrentTarget = nil
                 continue
             end
-
-            if not CurrentTarget then
-                CurrentTarget = GetClosestOre()
-                continue
-            end
-
-            local Ore = CurrentTarget
-            local Dir = (Ore.Position - Root.Position).Unit
-            local TargetPos = Ore.Position - Dir * getgenv().Config.SafeDistance
-
-            GoTo(TargetPos, Ore.Position)
-
-            local Delay = math.random(getgenv().Config.MinSwingDelay * 100, getgenv().Config.MaxSwingDelay * 100) / 100
-            pcall(
-                function()
-                    ToolActivate:InvokeServer("Pickaxe")
-                end
-            )
-
-            task.wait(Delay)
+        else
+            CurrentTarget = nil
         end
+
+        if not CurrentTarget then
+            CurrentTarget = GetClosestOre()
+            continue
+        end
+
+        local Ore = CurrentTarget
+        local Dir = (Ore.Position - Root.Position).Unit
+        local TargetPos = Ore.Position - Dir * getgenv().Config.SafeDistance
+
+        GoTo(TargetPos, Ore.Position)
+
+        local Delay = math.random(getgenv().Config.MinSwingDelay*100, getgenv().Config.MaxSwingDelay*100)/100
+        pcall(function()
+            ToolActivate:InvokeServer("Pickaxe")
+        end)
+
+        task.wait(Delay)
     end
-)
+end)
