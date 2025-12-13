@@ -1,0 +1,8 @@
+--[[
+  Open-source Roblox scripts.
+  This is a compiled Darklua file.
+
+  If you would like to view the source code, visit:
+  https://github.com/ThatOneDudeV69/open-src-scripts.git
+]]
+
