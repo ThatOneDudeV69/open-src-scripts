@@ -1,11 +1,12 @@
 #!/bin/bash
+
 GAME_NAME="$1"
 if [ -z "$GAME_NAME" ]; then
     echo "Usage: ./build.sh gamename"
     exit 1
 fi
 
-SRC_PATH="games/$GAME_NAME/src/init.lua"
+SRC_PATH="games/$GAME_NAME/src/init.luau"
 OUT_PATH="dist/$GAME_NAME.lua"
 HEADER="header.txt"
 
@@ -15,11 +16,14 @@ if [ ! -f "$SRC_PATH" ]; then
 fi
 
 mkdir -p dist
+
 TMP_BUILD="tmp_build_$GAME_NAME"
 mkdir -p "$TMP_BUILD"
 
 cp -r "games/$GAME_NAME/src/." "$TMP_BUILD/"
 cp -r "shared/." "$TMP_BUILD/shared/"
+
+mv "$TMP_BUILD/init.luau" "$TMP_BUILD/init.lua"
 
 TEMP_OUT="$TMP_BUILD/compiled.lua"
 
