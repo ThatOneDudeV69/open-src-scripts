@@ -3,6 +3,6 @@ local Games = {
     [76558904092080] = "https://raw.githubusercontent.com/ThatOneDudeV69/open-src-scripts/refs/heads/main/dist/TheForge.lua"
 }
 
-if Games[game.placeId] then
-    loadstring(game:HttpGet(Games[game.placeId])()
+if Games[game.PlaceId] then
+    loadstring(game:HttpGet(Games[game.PlaceId]))()
 end
