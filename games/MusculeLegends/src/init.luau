@@ -48,7 +48,6 @@ task.spawn(function()
     SaveManagerLoaded = true
 end)
 
--- Load features directly via string literals
 task.spawn(function()
     repeat task.wait() until Window and Options
     require("./features/AutoFarm")(Window, Options)
