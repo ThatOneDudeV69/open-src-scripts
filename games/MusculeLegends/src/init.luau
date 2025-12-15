@@ -79,14 +79,14 @@ task.spawn(function()
 	table.insert(LoadedTasks, true)
 end)
 
-task.spawn(function()
+--[[task.spawn(function()
 	repeat
 		task.wait()
 	until Window and Options
 	require("./features/AutoKill")(Window, Options)
 	table.insert(LoadedTasks, true)
 end)
-
+]]
 task.spawn(function()
 	repeat
 		task.wait()
@@ -143,6 +143,6 @@ end)
 task.spawn(function()
 	repeat
 		task.wait()
-	until #LoadedTasks == 10 and SaveManagerLoaded
+	until #LoadedTasks == 9 and SaveManagerLoaded
 	Logger.Log("MusculeLegends fully initialized in " .. tostring(os.clock() - StartTime) .. " seconds")
 end)
