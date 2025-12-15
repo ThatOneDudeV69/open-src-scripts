@@ -13,19 +13,22 @@ local AutoEggThread = nil
 local ToolRunning = {}
 local ToolThreads = {}
 
+local function Click()
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1)
+    task.wait(0.05)
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1)
+end
+
 local function ForceSitLoop()
     local Character = LocalPlayer.Character
     local Humanoid = Character and Character:FindFirstChild("Humanoid")
     if not Humanoid or Humanoid.Sit then return end
 
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
-    task.wait(0.3)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
-
     repeat
         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
         task.wait(0.1)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        
     until Humanoid.Sit
 end
 
@@ -37,11 +40,33 @@ end
 
 local function EatEgg()
     local Character = LocalPlayer.Character
-    local Humanoid = Character and Character:FindFirstChild("Humanoid")
-    if Humanoid and not Humanoid.Sit then
+    if not Character then return end
+
+    local Humanoid = Character:FindFirstChild("Humanoid")
+    if not Humanoid then return end
+
+    local WasSitting = Humanoid.Sit
+
+    if WasSitting then
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+        task.wait(0.1)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+    end
+
+    local Tool = Character:FindFirstChildOfClass("Tool")
+    if not Tool or Tool.Name ~= "Protein Egg" then
+        local Egg = GetTool("Protein Egg")
+        if not Egg then return end
+        Egg.Parent = Character
+        task.wait()
+    end
+
+    Click()
+
+    if WasSitting then
+        task.wait(0.2)
         ForceSitLoop()
     end
-    ReplicatedStorage.rEvents.proteinEggEvent:FireServer("useEgg")
 end
 
 local function AutoEggLoop()
