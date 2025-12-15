@@ -1,8 +1,14 @@
+local VERSION = "1.0.0"
+
+local BASE_URL = "https://github.com/ThatOneDudeV69/open-src-scripts/releases/download/%s/"
+
 local Games = {
-    [3623096087] = "https://raw.githubusercontent.com/ThatOneDudeV69/open-src-scripts/refs/heads/main/dist/MusculeLegends.lua",
-    [76558904092080] = "https://raw.githubusercontent.com/ThatOneDudeV69/open-src-scripts/refs/heads/main/dist/TheForge.lua"
+    [3623096087] = "MusculeLegends.lua",
+    [76558904092080] = "TheForge.lua"
 }
 
-if Games[game.PlaceId] then
-    loadstring(game:HttpGet(Games[game.PlaceId]))()
+local ScriptName = Games[game.PlaceId]
+if ScriptName then
+    local Url = BASE_URL:format(VERSION) .. ScriptName
+    loadstring(game:HttpGet(Url))()
 end
